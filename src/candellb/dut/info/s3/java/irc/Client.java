@@ -36,22 +36,23 @@ public class Client implements Runnable {
 			sendMessage("Pseudo : ");
 			username = reader.readLine();
 
-			Mailbox.getInstance().sendMessage("*** " + username + " a rejoint le chat");
+			Mailbox.getInstance().sendMessage("*** " + username + " a rejoint le chat\n");
 
-			sendMessage("\nBienvenue sur IUT Relay Chat, " + username + " !");
+			sendMessage("\nBienvenue sur IUT Relay Chat, " + username + " !\n");
 			sendMessage("Vous pouvez désormais dialoguer avec les " +
-					(server.getConnectedClients().size() - 1) + " autres utilisateurs connectés.");
-			sendMessage("Tapez " + COMMAND_QUIT + " pour quitter le chat.\n");
+					(server.getConnectedClients().size() - 1) + " autres utilisateurs connectés.\n");
+			sendMessage("Tapez " + COMMAND_QUIT + " pour quitter le chat.\n\n");
 
 			while(!nextLine.equals(COMMAND_QUIT)) {
+				sendMessage("> ");
 				nextLine = reader.readLine();
 
 				if(!nextLine.equals(COMMAND_QUIT) && !nextLine.isEmpty()) {
-					Mailbox.getInstance().sendMessage("<" + username + "> " + nextLine);
+					Mailbox.getInstance().sendMessage("<" + username + "> " + nextLine + "\n");
 				}
 			}
 
-			Mailbox.getInstance().sendMessage("*** " + username + " a quitté le chat");
+			Mailbox.getInstance().sendMessage("*** " + username + " a quitté le chat\n");
 			server.getConnectedClients().remove(this);
 			socket.close();
 		} catch(IOException e) {
@@ -60,7 +61,7 @@ public class Client implements Runnable {
 	}
 
 	public void sendMessage(String message) throws IOException {
-		writer.write(message + "\n");
+		writer.write(message);
 		writer.flush();
 	}
 
