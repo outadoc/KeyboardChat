@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * Classe Facteur, qui se charge de délivrer les messages envoyés aux clients.
+ * <p/>
  * Created by outadoc on 25/11/14.
  */
 public class Postman {

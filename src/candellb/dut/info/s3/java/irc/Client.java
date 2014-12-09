@@ -9,6 +9,9 @@ import java.io.OutputStreamWriter;
 import javax.net.ssl.SSLSocket;
 
 /**
+ * Classe chargée de gérer un client tout au long de sa vie.
+ * Accueille le client avec un message, lui demande son pseudo, et récupère ses messages.
+ * <p/>
  * Created by outadoc on 25/11/14.
  */
 public class Client implements Runnable {
@@ -61,15 +64,31 @@ public class Client implements Runnable {
 		}
 	}
 
+	/**
+	 * Envoie un message au client.
+	 *
+	 * @param message le message à envoyer
+	 * @throws IOException si une erreur d'entrée/sortie a eu lieu
+	 */
 	public void sendMessage(String message) throws IOException {
 		writer.write(message);
 		writer.flush();
 	}
 
+	/**
+	 * Récupère le pseudo du client.
+	 *
+	 * @return le pseudo actuel du client
+	 */
 	public String getUsername() {
 		return username;
 	}
 
+	/**
+	 * Change le pseudo du client.
+	 *
+	 * @param username le nouveau pseudo du client
+	 */
 	public void setUsername(String username) {
 		this.username = username;
 	}

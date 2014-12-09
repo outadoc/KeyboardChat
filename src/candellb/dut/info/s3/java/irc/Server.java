@@ -12,37 +12,51 @@ import javax.net.ssl.SSLSocket;
 /**
  * Classe serveur ("connecteur").
  * Se charge de créer le socket du serveur et d'attendre la connexion des clients.
+ * <p/>
+ * Created by outadoc on 25/11/14.
  */
 public class Server {
 
+	// Le port sur lequel les clients devront se connecter
 	public static final int SERVER_PORT = 13337;
 
+	// La liste des clients connectés au serveur
 	private List<Client> connectedClients;
 
 	public Server() {
 		this.connectedClients = new LinkedList<Client>();
 
-		//on instancie un nouveau facteur et on le range dans la BAL
+		// On instancie un nouveau facteur et on le range dans la BAL
 		Mailbox.setPostman(new Postman(this));
 	}
 
+	/**
+	 * Lance le serveur de chat et lance l'écoute sur le port SERVER_PORT.
+	 */
 	public void startServer() {
+		// On retire SSL des protocoles supportés, trop vieux, trop faillible
 		String[] supportedProtocols = new String[]{"TLSv1", "TLSv1.1", "TLSv1.2"};
 
+		// On charge notre trousseau avec le certificat du serveur, Java se charge du reste
 		System.setProperty("javax.net.ssl.keyStore", "ks_td_reseau");
 		System.setProperty("javax.net.ssl.keyStorePassword", "potato");
 
 		try {
+			// On créé un serveur SSL ici, avec SSLServerSocket
 			SSLServerSocketFactory sslFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 			SSLServerSocket serverSocket = (SSLServerSocket) sslFactory.createServerSocket(SERVER_PORT);
 
 			serverSocket.setEnabledProtocols(supportedProtocols);
 
+			// Si on arrive ici, le serveur est lancé !
 			System.out.println("server ok to go, listening on port " + SERVER_PORT);
 			System.out.println("supported protocols: " + Arrays.toString(supportedProtocols));
 
+			// TODO: Si possible, faire une condition de sortie
 			while(true) {
 				SSLSocket clientSocket = (SSLSocket) serverSocket.accept();
+
+				// Quand un client se connecte, on l'ajoute à la liste et on le gère sur un nouveau thread
 				Client client = new Client(clientSocket, this);
 				Thread clientThread = new Thread(client);
 				connectedClients.add(client);
@@ -55,6 +69,11 @@ public class Server {
 		}
 	}
 
+	/**
+	 * Récupère la liste des clients connectés.
+	 *
+	 * @return une liste contenant les clients encore connectés
+	 */
 	public List<Client> getConnectedClients() {
 		return connectedClients;
 	}
