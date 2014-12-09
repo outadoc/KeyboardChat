@@ -16,6 +16,12 @@ public class Postman {
 		this.server = server;
 	}
 
+	/**
+	 * Distribue un message à tous les clients connectés au serveur.
+	 *
+	 * @param message le message à envoyer
+	 * @throws IOException si une erreur s'est produite lors de l'envoi à un client
+	 */
 	public void broadcastMessageToAllClients(String message) throws IOException {
 		List<Client> clientList = server.getConnectedClients();
 
