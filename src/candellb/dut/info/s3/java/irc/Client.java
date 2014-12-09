@@ -53,10 +53,11 @@ public class Client implements Runnable {
 			}
 
 			Mailbox.getInstance().sendMessage("*** " + username + " a quitté le chat\n");
-			server.getConnectedClients().remove(this);
 			socket.close();
 		} catch(IOException e) {
 			e.printStackTrace();
+		} finally {
+			server.getConnectedClients().remove(this);
 		}
 	}
 
