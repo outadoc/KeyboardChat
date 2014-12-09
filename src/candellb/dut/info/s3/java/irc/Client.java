@@ -36,26 +36,45 @@ public class Client implements Runnable {
 		try {
 			String nextLine = "";
 
-			sendMessage("Pseudo : ");
-			username = reader.readLine();
+			// Tant qu'on est pas sortis de la boucle avec un break;
+			while(true) {
+				// On demande son pseudo au client
+				sendMessage("Pseudo : ");
+				String desiredUsername = reader.readLine();
 
-			Mailbox.getInstance().sendMessage("*** " + username + " a rejoint le chat\n");
+				try {
+					// On essaye de changer le pseudo avec celui désiré; si ça fonctionne, on sort du while
+					setUsername(desiredUsername);
+					break;
+				} catch(UsernameUnavailableException e) {
+					// Si le pseudo choisi n'est plus disponible, on continue de boucler et on redemande un pseudo
+					e.printStackTrace();
+					sendMessage("Désolé, " + desiredUsername + " est déjà pris !\n");
+				}
+			}
 
-			sendMessage("\nBienvenue sur IUT Relay Chat, " + username + " !\n");
+			// Ici, on envoie un message à tous les utilisateurs
+			Mailbox.getInstance().sendMessage("*** " + getUsername() + " a rejoint le chat\n");
+
+			// Là, c'est un message privé, il n'est envoyé que sur le socket du client qui vient de se connecter
+			sendMessage("\nBienvenue sur IUT Relay Chat, " + getUsername() + " !\n");
 			sendMessage("Vous pouvez désormais dialoguer avec les " +
 					(server.getConnectedClients().size() - 1) + " autres utilisateurs connectés.\n");
 			sendMessage("Tapez " + COMMAND_QUIT + " pour quitter le chat.\n\n");
 
+			// Tant que le client n'a pas tapé la commande de déconnexion
 			while(!nextLine.equals(COMMAND_QUIT)) {
+				// On affiche un prompt, et on demande un message
 				sendMessage("> ");
 				nextLine = reader.readLine();
 
 				if(!nextLine.equals(COMMAND_QUIT) && !nextLine.isEmpty()) {
-					Mailbox.getInstance().sendMessage("<" + username + "> " + nextLine + "\n");
+					// On envoie son message à tous les autres clients
+					Mailbox.getInstance().sendMessage("<" + getUsername() + "> " + nextLine + "\n");
 				}
 			}
 
-			Mailbox.getInstance().sendMessage("*** " + username + " a quitté le chat\n");
+			Mailbox.getInstance().sendMessage("*** " + getUsername() + " a quitté le chat\n");
 			socket.close();
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -89,7 +108,14 @@ public class Client implements Runnable {
 	 *
 	 * @param username le nouveau pseudo du client
 	 */
-	public void setUsername(String username) {
+	public void setUsername(String username) throws UsernameUnavailableException {
+		// On vérifie si le nom d'utilisateur souhaité n'est pas déjà utilisé
+		for(Client client : server.getConnectedClients()) {
+			if(client.getUsername() != null && client.getUsername().equals(username)) {
+				throw new UsernameUnavailableException(username + " est déjà utilisé");
+			}
+		}
+
 		this.username = username;
 	}
 }
