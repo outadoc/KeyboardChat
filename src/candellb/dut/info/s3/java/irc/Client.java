@@ -17,6 +17,8 @@ import javax.net.ssl.SSLSocket;
 public class Client implements Runnable {
 
 	private static final String COMMAND_QUIT = "/quit";
+	private static final String COMMAND_STOP_SERVER = "/stop";
+
 	private SSLSocket socket;
 	private Server server;
 	private BufferedWriter writer;
@@ -68,7 +70,7 @@ public class Client implements Runnable {
 				sendMessage("> ");
 				nextLine = reader.readLine();
 
-				if(!nextLine.equals(COMMAND_QUIT) && !nextLine.isEmpty()) {
+				if(!isCommand(nextLine) && !nextLine.isEmpty()) {
 					// On envoie son message à tous les autres clients
 					Mailbox.getInstance().sendMessage("<" + getUsername() + "> " + nextLine + "\n");
 				}
@@ -76,18 +78,26 @@ public class Client implements Runnable {
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
-			server.getConnectedClients().remove(this);
-
-			try {
-				if(!socket.isClosed()) {
-					socket.close();
-				}
-
-				Mailbox.getInstance().sendMessage("*** " + getUsername() + " a quitté le chat\n");
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
+			closeClient();
 		}
+	}
+
+	public void closeClient() {
+		server.getConnectedClients().remove(this);
+
+		try {
+			if(!socket.isClosed()) {
+				socket.close();
+			}
+
+			Mailbox.getInstance().sendMessage("*** " + getUsername() + " a quitté le chat\n");
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private boolean isCommand(String message) {
+		return (message != null) && (message.equals(COMMAND_QUIT) || message.equals(COMMAND_STOP_SERVER));
 	}
 
 	/**
