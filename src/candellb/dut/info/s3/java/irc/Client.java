@@ -73,7 +73,7 @@ public class Client implements Runnable {
 					Mailbox.getInstance().sendMessage("<" + getUsername() + "> " + nextLine + "\n");
 				}
 			}
-		} catch(IOException | NullPointerException e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
 			server.getConnectedClients().remove(this);
