@@ -36,17 +36,13 @@ public class Mailbox {
 	 *
 	 * @param message le message à envoyer
 	 */
-	public synchronized void sendMessage(String message) {
+	public synchronized void sendMessage(String message) throws IOException {
 		if(postman == null) {
 			throw new IllegalStateException("Mailbox must be set before sending a message.");
 		}
 
-		try {
-			System.out.println("broadcasting: " + message);
-			postman.broadcastMessageToAllClients(message);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+		System.out.println("broadcasting: " + message);
+		postman.broadcastMessageToAllClients(message);
 
 		notifyAll();
 	}

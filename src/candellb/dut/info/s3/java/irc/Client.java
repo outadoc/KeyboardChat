@@ -73,13 +73,20 @@ public class Client implements Runnable {
 					Mailbox.getInstance().sendMessage("<" + getUsername() + "> " + nextLine + "\n");
 				}
 			}
-
-			Mailbox.getInstance().sendMessage("*** " + getUsername() + " a quitté le chat\n");
-			socket.close();
-		} catch(IOException e) {
+		} catch(IOException | NullPointerException e) {
 			e.printStackTrace();
 		} finally {
 			server.getConnectedClients().remove(this);
+
+			try {
+				if(!socket.isClosed()) {
+					socket.close();
+				}
+
+				Mailbox.getInstance().sendMessage("*** " + getUsername() + " a quitté le chat\n");
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
