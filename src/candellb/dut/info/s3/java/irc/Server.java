@@ -15,7 +15,7 @@ import javax.net.ssl.SSLSocket;
  * <p/>
  * Created by outadoc on 25/11/14.
  */
-public class Server {
+public class Server implements Runnable {
 
 	// Le port sur lequel les clients devront se connecter
 	public static final int SERVER_PORT = 13337;
@@ -30,10 +30,7 @@ public class Server {
 		Mailbox.setPostman(new Postman(this));
 	}
 
-	/**
-	 * Lance le serveur de chat et lance l'écoute sur le port SERVER_PORT.
-	 */
-	public void startServer() {
+	public void run() {
 		// On retire SSL des protocoles supportés, trop vieux, trop faillible
 		String[] supportedProtocols = new String[]{"TLSv1", "TLSv1.1", "TLSv1.2"};
 
