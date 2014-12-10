@@ -61,7 +61,11 @@ public class Server implements Runnable {
 				clientThread.start();
 			}
 		} catch(IOException e) {
-			System.out.println("server stopped successfully!");
+			if(connectedClients.isEmpty()) {
+				System.out.println("server stopped successfully!");
+			} else {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -70,7 +74,7 @@ public class Server implements Runnable {
 	 */
 	public void stopServer() {
 		// Ferme les connexions de tous les clients
-		for(Client client : getConnectedClients()) {
+		for(Client client : connectedClients) {
 			client.closeClient();
 		}
 
