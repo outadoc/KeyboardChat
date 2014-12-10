@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.SocketException;
 
 import javax.net.ssl.SSLSocket;
 
@@ -18,6 +19,8 @@ public class Client implements Runnable {
 
 	private static final String COMMAND_QUIT = "/quit";
 	private static final String COMMAND_STOP_SERVER = "/stop";
+
+	private boolean isDead = false;
 
 	private SSLSocket socket;
 	private Server server;
@@ -68,7 +71,17 @@ public class Client implements Runnable {
 			while(!nextLine.equals(COMMAND_QUIT)) {
 				// On affiche un prompt, et on demande un message
 				sendMessage("> ");
-				nextLine = reader.readLine();
+
+				try {
+					nextLine = reader.readLine();
+				} catch(SocketException e) {
+					return;
+				}
+
+				if(nextLine.equals(COMMAND_STOP_SERVER)) {
+					server.stopServer();
+					return;
+				}
 
 				if(!isCommand(nextLine) && !nextLine.isEmpty()) {
 					// On envoie son message à tous les autres clients
@@ -82,10 +95,22 @@ public class Client implements Runnable {
 		}
 	}
 
-	public void closeClient() {
+	/**
+	 * Ferme la connexion d'un client, et le retire de la liste des clients.
+	 */
+	public synchronized void closeClient() {
+		// On se rappelle de l'état du client;
+		// si cette méthode est appelée deux fois, elle ne fera rien la seconde fois.
+		if(isDead) {
+			return;
+		}
+
+		// Retire le client de la liste des clients connectés
+		isDead = true;
 		server.getConnectedClients().remove(this);
 
 		try {
+			// Ferme la socket si c'est nécessaire, et notifie les autres utilisateurs
 			if(!socket.isClosed()) {
 				socket.close();
 			}
@@ -94,8 +119,15 @@ public class Client implements Runnable {
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
+
 	}
 
+	/**
+	 * Détermine si un message est une commande.
+	 *
+	 * @param message le message à analyser
+	 * @return true si message est une commande, false sinon
+	 */
 	private boolean isCommand(String message) {
 		return (message != null) && (message.equals(COMMAND_QUIT) || message.equals(COMMAND_STOP_SERVER));
 	}

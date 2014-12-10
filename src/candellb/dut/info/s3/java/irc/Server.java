@@ -22,6 +22,7 @@ public class Server implements Runnable {
 
 	// La liste des clients connectés au serveur
 	private List<Client> connectedClients;
+	private SSLServerSocket serverSocket;
 
 	public Server() {
 		this.connectedClients = new LinkedList<Client>();
@@ -41,7 +42,7 @@ public class Server implements Runnable {
 		try {
 			// On créé un serveur SSL ici, avec SSLServerSocket
 			SSLServerSocketFactory sslFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-			SSLServerSocket serverSocket = (SSLServerSocket) sslFactory.createServerSocket(SERVER_PORT);
+			serverSocket = (SSLServerSocket) sslFactory.createServerSocket(SERVER_PORT);
 
 			serverSocket.setEnabledProtocols(supportedProtocols);
 
@@ -60,7 +61,25 @@ public class Server implements Runnable {
 
 				clientThread.start();
 			}
+		} catch(IOException e) {
+			System.out.println("server stopped successfully!");
+		}
+	}
 
+	/**
+	 * Ferme toutes les connexions au client, puis ferme le serveur.
+	 */
+	public void stopServer() {
+		// Ferme les connexions de tous les clients
+		for(Client client : getConnectedClients()) {
+			client.closeClient();
+		}
+
+		System.out.println("stopping server...");
+
+		try {
+			// Ferme la chaussette du serveur
+			serverSocket.close();
 		} catch(IOException e) {
 			e.printStackTrace();
 		}

@@ -9,7 +9,7 @@ public class KeyboardChat {
 
 	public static void main(String args[]) {
 		// On créé un nouveau serveur et on le lance
-		Thread serverThread = new Thread(new Server());
+		Thread serverThread = new Thread(new Server(), "Serveur");
 		serverThread.start();
 	}
 
