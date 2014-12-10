@@ -65,7 +65,7 @@ public class Client implements Runnable {
 			sendMessage("\nBienvenue sur IUT Relay Chat, " + getUsername() + " !\n");
 			sendMessage("Vous pouvez désormais dialoguer avec les " +
 					(server.getConnectedClients().size() - 1) + " autres utilisateurs connectés.\n");
-			sendMessage("Tapez " + COMMAND_QUIT + " pour quitter le chat.\n\n");
+			sendMessage("Tapez " + COMMAND_QUIT + " pour quitter le chat, ou " + COMMAND_STOP_SERVER + " pour arrêter le serveur.\n\n");
 
 			// Tant que le client n'a pas tapé la commande de déconnexion
 			while(!nextLine.equals(COMMAND_QUIT)) {

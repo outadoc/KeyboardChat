@@ -50,7 +50,6 @@ public class Server implements Runnable {
 			System.out.println("server ok to go, listening on port " + SERVER_PORT);
 			System.out.println("supported protocols: " + Arrays.toString(supportedProtocols));
 
-			// TODO: Si possible, faire une condition de sortie
 			while(true) {
 				SSLSocket clientSocket = (SSLSocket) serverSocket.accept();
 
